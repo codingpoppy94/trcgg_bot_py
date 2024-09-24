@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
 import os
+from service import Service
+
+service = Service()
 
 token = os.getenv('TOKEN')
 
@@ -10,8 +13,8 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command(name='전적')
-async def record(ctx):
-    await ctx.send('전적 보여줌')
+async def record(ctx, riot_name: str):
+    await ctx.send(embed=service.all(riot_name))
     
 @bot.command(name='장인')
 async def master(ctx):
