@@ -2,14 +2,7 @@ from call_util import RequestUtil
 from datetime import datetime
 import json
 from embed import TemplateUtil
-        
-# 예외처리
-class RecordNotFoundException(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-    
-    def __str__(self):
-        return self.msg
+from exceptions import RecordNotFoundException
 
 ru = RequestUtil()
 

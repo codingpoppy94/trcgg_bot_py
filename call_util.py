@@ -21,9 +21,12 @@ class RequestUtil:
             else:
                 raise ValueError("Unsupported HTTP method")
             
-            # 상태 코드와 JSON 데이터를 함께 반환
-            return {"status_code": res.status_code, "data": json.loads(res.content)}
-            # return json.loads(res)
+            if res.status_code != 200:
+                error_message = res.text
+                
+                raise Exception(f"Error {res.status_code}: {error_message}") 
+            else:
+                return {"status_code": res.status_code, "data": res.json()}
         
         except requests.exceptions.RequestException as e:
             print(f"Error while making request: {e}")
@@ -86,7 +89,7 @@ class RequestUtil:
         url = contextPath + 'league/gameResult/' + game_id
         return self.call(url)
 
-    # 부캐닉 조회 
+    # 부캐 조회
     def get_mapping_name(self):
         url = contextPath + 'league/getMappingName'
         return self.call(url)
