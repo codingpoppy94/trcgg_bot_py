@@ -1,6 +1,6 @@
 from call_util import RequestUtil
 from datetime import datetime
-import json
+import re
 from embed import TemplateUtil
 from exceptions import RecordNotFoundException
 
@@ -9,7 +9,10 @@ ru = RequestUtil()
 class Service:
     
     # !전적
-    def all_record(self, riot_name:str):
+    def all_record(self, ctx, riot_name:str):
+        
+        if riot_name is None:
+            riot_name = self.get_member_nick(ctx)
         
         # 통합 전적
         all_count = 0
@@ -414,7 +417,32 @@ class Service:
             return result[:2000]
         
         return result
+    
+    # 리플레이 저장
+    def send_discord_attachment_url(self, message):
+        file_url = ""
+        file_name = ""
+        create_user = ""
+        
+        for attachment in message.attachments:
+            # 첨부파일의 URL을 가져옴
+            file_url = attachment.url
+            file_name = attachment.filename
+        create_user = message.author.nick or message.author.name
+        
+        # 확장자 .rofl 아닐경우 무시
+        if not file_name.endswith('.rofl') : 
+            return None
             
+        # 리플 파일명 체크
+        if self.file_name_check(file_name) :
+            # file_name = file_name.split(".")[-1]
+            parts = file_name.split(".")
+            file_name = ".".join(parts[:-1])
+            # 리플 저장 call
+            return ru.save_league(file_url, file_name, create_user)['data']
+        else :
+            return f":red_circle:등록실패: {file_name} 잘못된 리플 파일 형식"
          
     ################ #######################    
         
@@ -446,3 +474,24 @@ class Service:
                 return year, month
             except RecordNotFoundException("잘못된 형식"):
                 return
+
+    # 본인 member nickname 가져오기            
+    def get_member_nick(self, ctx):
+        riot_name = ctx.author.nick 
+        if riot_name is None:
+            raise RecordNotFoundException("별명 설정 필요")
+        else :
+            riot_name = riot_name.split("/")[0]
+            return riot_name
+    
+    # 리플 파일명 정규식 체크
+    def file_name_check(self, file_name):
+        # 정규 표현식 패턴
+        regexp = r"^[a-zA-Z0-9]*_\d{4}_\d{4}\.rofl$"
+        
+        # 정규식 매칭 여부 확인
+        if re.match(regexp, file_name):
+            return True
+        else:
+            return False
+        

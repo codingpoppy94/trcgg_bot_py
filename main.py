@@ -18,9 +18,9 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 ## 검색
 
 @bot.command(name='전적')
-async def record(ctx, riot_name: str):
+async def record(ctx, riot_name: str= None):
     try:
-        await ctx.send(embed=service.all_record(riot_name))
+        await ctx.send(embed=service.all_record(ctx, riot_name))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
     
@@ -117,6 +117,23 @@ async def delete_replay(ctx, game_id: str):
         await ctx.send(admin_service.delete_league(ctx, game_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
+        
+# 첨부파일(리플레이) event
+@bot.event
+async def on_message(message):
+    # 메시지가 봇이 전송한 것이라면 무시    
+    if message.author.bot:
+        return
+    elif message.attachments:
+        result = service.send_discord_attachment_url(message)
+        if result is None:
+            return
+        else:
+            await message.channel.send(result)
+    else:
+        # 명령어 처리
+        await bot.process_commands(message)
+
         
 # CommandNotFound 에러 핸들러
 @bot.event

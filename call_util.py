@@ -24,7 +24,8 @@ class RequestUtil:
             if res.status_code != 200:
                 error_message = res.text
                 
-                raise Exception(f"Error {res.status_code}: {error_message}") 
+                return Exception(f"Error {res.status_code}: {error_message}") 
+                # raise Exception(f"Error {res.status_code}: {error_message}") 
             else:
                 return {"status_code": res.status_code, "data": res.json()}
         
