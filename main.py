@@ -4,19 +4,24 @@ import os
 from service import Service
 from admin_service import AdminService
 from exceptions import RecordNotFoundException
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 service = Service()
 admin_service = AdminService()
 
+# os 설정
 token = os.getenv('TOKEN')
+trc_channel_id = int(os.getenv('TRC_CHANNEL_ID'))
 
+# Discord 봇 설정
 intents = discord.Intents.default()
 intents.message_content = True
-
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-## 검색
+# 스케줄러 설정
+scheduler = AsyncIOScheduler()
 
+## 검색
 @bot.command(name='전적')
 async def record(ctx, riot_name: str= None):
     try:
@@ -118,6 +123,8 @@ async def delete_replay(ctx, game_id: str):
     except RecordNotFoundException as e:
         await ctx.send(str(e))
         
+## event
+        
 # 첨부파일(리플레이) event
 @bot.event
 async def on_message(message):
@@ -145,10 +152,19 @@ async def on_command_error(ctx, error):
         # 다른 에러 처리 (선택 사항)
         raise error
 
+# bot 실행시    
+@bot.event
+async def on_ready():
+    scheduler.start()
     
+# 내전 출석에 오후 5시마다 메시지 전송
+@scheduler.scheduled_job('cron', hour=17, minute=0)
+async def scheduled_message():
+    channel = bot.get_channel(trc_channel_id)
+    if channel:
+        await channel.send("```19:30 시작합니다. 시작 5분전에 대기해주세요.```")
+
 # bot.add_command(_record)
-
-
 # client = discord.Client(intents=intents)
 # 
 # @client.event
@@ -164,4 +180,5 @@ async def on_command_error(ctx, error):
 #         await message.channel.send('Hello!')
 
 # client.run(token)
+
 bot.run(token)
