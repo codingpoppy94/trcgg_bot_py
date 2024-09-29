@@ -35,6 +35,11 @@ class RequestUtil:
 
 # GET 
 
+    # 전적 조회에 필요한 모든 서비스 조회
+    def get_all_record(self, riot_name):
+        url = contextPath + 'league/getAllRecord/' + riot_name
+        return self.call(url)
+
     # 전체전적조회
     def get_record(self, riot_name):
         url = contextPath + 'league/getRecord/' + riot_name

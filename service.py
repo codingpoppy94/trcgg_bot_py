@@ -13,6 +13,14 @@ class Service:
         
         if riot_name is None:
             riot_name = self.get_member_nick(ctx)
+            
+        all_data = ru.get_all_record(riot_name)
+        if all_data['status_code'] != 200:
+            raise RecordNotFoundException("connection error")
+        
+        if not all_data.get("data").get("record_data"):
+            raise RecordNotFoundException("not found data")
+        all_data = all_data['data']
         
         # 통합 전적
         all_count = 0
@@ -23,15 +31,8 @@ class Service:
         thumbs_up_str = ":thumbsup: "
         line_desc = ""
         
-        all_data = ru.get_record(riot_name)
-        
-        if all_data["status_code"] != 200:
-            raise RecordNotFoundException("connection error")
-        
-        if not all_data.get("data"):
-            raise RecordNotFoundException("not found data")
-            
-        for data in all_data["data"]:
+        record_data = all_data['record_data']
+        for data in record_data:
             all_count += data.get("total_count", 0)
             all_win += data.get("win", 0)
             all_lose += data.get("lose", 0)
@@ -39,7 +40,7 @@ class Service:
             if(data.get("total_count") > max_count):
                 max_count = data.get("total_count")
         
-        for data in all_data["data"]:
+        for data in record_data:
             if(data.get("total_count") == max_count):
                 line_desc += thumbs_up_str
             line_desc += TemplateUtil.make_stat(data.get("position"), data.get("win"), data.get("win_rate"), data.get("kda"))    
@@ -48,11 +49,10 @@ class Service:
         all_desc = f"통합전적 - {all_count}전 {all_win}승/{all_win_rate}% \n"  
                 
         # 이번달 전적
-        month_data = ru.get_record_month(riot_name)
+        month_data = all_data['month_data']
         month_desc = ""
-        if(month_data["status_code"] == 200):
-            for data in month_data["data"]:
-                month_desc = TemplateUtil.make_stat("이번달 전적", data.get("win"), data.get("win_rate"), data.get("kda"))
+        for data in month_data:
+            month_desc = TemplateUtil.make_stat("이번달 전적", data.get("win"), data.get("win_rate"), data.get("kda"))
         
         # 최근 전적
         recent_total = 0
@@ -61,19 +61,19 @@ class Service:
         color_str = ""
         recent_value = ""
         
-        recent_data = ru.get_top_ten(riot_name)
-        if(recent_data["status_code"] == 200):
-            for data in recent_data["data"]:
-                recent_total += 1
-                if data.get("game_result") == "승":
-                    recent_win += 1
-                    color_str = ":blue_circle: "
-                else:
-                    recent_lose += 1
-                    color_str = ":red_circle: "
-                kda = f"{data.get('kill')}/{data.get('death')}/{data.get('assist')}"
-                recent_value += f"{color_str} {data.get('champ_name')} {kda} \n"
-               
+        recent_data = all_data['recent_data']
+    
+        for data in recent_data:
+            recent_total += 1
+            if data.get("game_result") == "승":
+                recent_win += 1
+                color_str = ":blue_circle: "
+            else:
+                recent_lose += 1
+                color_str = ":red_circle: "
+            kda = f"{data.get('kill')}/{data.get('death')}/{data.get('assist')}"
+            recent_value += f"{color_str} {data.get('champ_name')} {kda} \n"
+            
         recent_header = f"최근 {recent_total}전 {recent_win}승 {recent_lose}패"
         
         # 팀워크
@@ -83,19 +83,18 @@ class Service:
         low_team_header = "팀워크:broken_heart:"
         low_team_value = ""
         
-        with_team_data = ru.get_record_with_team(riot_name)
-        if with_team_data["status_code"] == 200:
-            team_data = with_team_data["data"]
-
-            # 팀워크 높은 순
-            high_team_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 52, greater_than=True)
-            for data in high_team_data:
-                good_team_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
-            
-            # 팀워크 낮은 순
-            low_team_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 48, greater_than=False)
-            for data in low_team_data:
-                low_team_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
+        with_team_data = all_data['with_team_data']
+        team_data = with_team_data
+        
+        # 팀워크 높은 순
+        high_team_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 52, greater_than=True)
+        for data in high_team_data:
+            good_team_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
+        
+        # 팀워크 낮은 순
+        low_team_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 48, greater_than=False)
+        for data in low_team_data:
+            low_team_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
         
         # 맞라인
         easy_rival_header = "맞라인:thumbsup:"
@@ -104,30 +103,27 @@ class Service:
         hard_rival_header = "맞라인:thumbsdown:"
         hard_rival_value = ""
         
-        other_team_data = ru.get_record_other_team(riot_name)
-        if other_team_data["status_code"] == 200:
-            team_data = other_team_data["data"]
+        other_team_data = all_data['other_team_data']
+        team_data = other_team_data
 
-            # 라이벌 자주 이기는 순
-            easy_rival_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 52, greater_than=True)
-            for data in easy_rival_data:
-                easy_rival_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
-            
-            # 라이벌 자주 지는 순
-            hard_rival_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 48, greater_than=False)
-            for data in hard_rival_data:
-                hard_rival_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
+        # 라이벌 자주 이기는 순
+        easy_rival_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 52, greater_than=True)
+        for data in easy_rival_data:
+            easy_rival_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
+        
+        # 라이벌 자주 지는 순
+        hard_rival_data = TemplateUtil.filter_and_sort_by_win_rate(team_data, 48, greater_than=False)
+        for data in hard_rival_data:
+            hard_rival_value += TemplateUtil.make_team_stat(data.get("riot_name"), data.get("win"), data.get("lose"), data.get("win_rate"))
         
         # Most Pick
         most_pick_header = "MostPick 10"
         most_pick_value = ""
         
-        most_pick_data = ru.get_most_pick(riot_name)
-        if most_pick_data["status_code"] == 200:
-            for data in most_pick_data["data"]:
-                most_pick_value += f"{data.get('champ_name')}: {data.get('total_count')}회 {data.get('win_rate')}% \n"
+        most_pick_data = all_data['most_pick_data']
+        for data in most_pick_data:
+            most_pick_value += f"{data.get('champ_name')}: {data.get('total_count')}회 {data.get('win_rate')}% \n"
             
-        
         desc = month_desc + "\n" + all_desc + line_desc
         
         # 호칭ex
