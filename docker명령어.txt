@@ -1,0 +1,12 @@
+docker network create trc_network
+
+----
+# docker build -t codingpoppy94/trc_bot:1.0 .
+
+docker buildx build --platform linux/arm64 -t codingpoppy94/trc_bot:1.0 .
+
+docker push codingpoppy94/trc_bot:1.0 
+
+docker pull codingpoppy94/trc_bot:1.0
+
+docker run -d --name trc_bot --network trc_network codingpoppy94/trc_bot:1.0

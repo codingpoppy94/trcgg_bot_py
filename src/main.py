@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 import os
 from service import Service
 from admin_service import AdminService
@@ -8,6 +9,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 service = Service()
 admin_service = AdminService()
+
+# .env 파일에서 환경 변수 로드
+load_dotenv()
 
 # os 설정
 token = os.getenv('TOKEN')
