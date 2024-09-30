@@ -91,9 +91,13 @@ class AdminService:
             
             sub_name, main_name = self.split_str(command)
             result = ru.save_mapping_name(sub_name, main_name)
+            result_2 = ru.update_riot_name(main_name, sub_name)
             
             if result["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
+            if result_2["status_code"] != 200:
+                raise RecordNotFoundException("connection error")
+            
             return "등록 및 변경 완료"
 
     # 부캐삭제
@@ -169,7 +173,7 @@ class AdminService:
     def split_str(self, command: str):
         if command is not None:
             try:
-                sub_name , main_name = command.split('/')
+                sub_name, main_name = command.split('/')
                 return sub_name, main_name
             except ValueError:  # split이 실패할 경우
                 raise RecordNotFoundException("잘못된 형식")
