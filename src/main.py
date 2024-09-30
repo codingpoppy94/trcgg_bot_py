@@ -27,7 +27,7 @@ scheduler = AsyncIOScheduler()
 
 ## 검색
 @bot.command(name='전적')
-async def record(ctx, riot_name: str= None):
+async def record(ctx, *, riot_name: str= None):
     try:
         await ctx.send(embed=service.all_record(ctx, riot_name))
     except RecordNotFoundException as e:
