@@ -122,7 +122,7 @@ class Service:
         
         most_pick_data = all_data['most_pick_data']
         for data in most_pick_data:
-            most_pick_value += f"{data.get('champ_name')}: {data.get('total_count')}회 {data.get('win_rate')}% \n"
+            most_pick_value += f"{data.get('champ_name')}: {data.get('total_count')}판 {data.get('win_rate')}% \n"
             
         desc = month_desc + "\n" + all_desc + line_desc
         
