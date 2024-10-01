@@ -13,7 +13,8 @@ class Service:
         
         if riot_name is None:
             riot_name = self.get_member_nick(ctx)
-        else : riot_name = riot_name.replace(" ", "")
+        else : 
+            riot_name = riot_name.replace(" ", "").replace('й','n').strip()
             
         all_data = ru.get_all_record(riot_name)
         if all_data['status_code'] != 200:
