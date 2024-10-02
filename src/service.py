@@ -13,8 +13,8 @@ class Service:
         
         if riot_name is None:
             riot_name = self.get_member_nick(ctx)
-        else : 
-            riot_name = riot_name.replace(" ", "").replace('й','n').strip()
+            
+        riot_name = riot_name.replace(" ", "").replace("й","n").strip()
             
         all_data = ru.get_all_record(riot_name)
         if all_data['status_code'] != 200:
@@ -480,7 +480,6 @@ class Service:
             raise RecordNotFoundException("별명 설정 필요")
         else :
             riot_name = riot_name.split("/")[0]
-            riot_name = riot_name.replace(" ","")
             return riot_name
     
     # 리플 파일명 정규식 체크
