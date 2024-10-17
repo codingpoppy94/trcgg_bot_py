@@ -15,7 +15,7 @@ class AdminService:
             "`!결과 {gameId}` 내전 게임 결과 검색 \n"
             "`!장인 {champ}` 픽률-승률 장인 목록 \n"
             "`!통계 게임|챔프` 게임,챔프 통계 \n"
-            "`!라인 {탑|정글|미드|원딜|서폿}` {라인}별 승률\n\n"
+            "`!라인 {탑|정글|미드|원딜|서폿}` 30게임 이상 {라인}별 승률\n\n"
         )
 
         # 관리자 명령어
@@ -50,7 +50,7 @@ class AdminService:
         return TemplateUtil.create_embed(json_data)
         
     # 부캐목록
-    def get_mapping_name(self):
+    def get_mapping_name(self, guild_id):
         
         json_data = {}
         
@@ -62,7 +62,7 @@ class AdminService:
             "\n"
         )
         
-        records = ru.get_mapping_name()
+        records = ru.get_mapping_name(guild_id)
         if records["status_code"] != 200:
             raise RecordNotFoundException("connection error")
         
@@ -85,13 +85,13 @@ class AdminService:
         return TemplateUtil.create_embed(json_data)
 
     # 부캐저장
-    def save_mapping_name(self, ctx, command):
+    def save_mapping_name(self, ctx, command, guild_id):
         
         if self.check_auth(ctx):
             
             sub_name, main_name = self.split_str(command)
-            result = ru.save_mapping_name(sub_name, main_name)
-            result_2 = ru.update_riot_name(main_name, sub_name)
+            result = ru.save_mapping_name(sub_name, main_name, guild_id)
+            result_2 = ru.update_riot_name(main_name, sub_name, guild_id)
             
             if result["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
@@ -101,11 +101,11 @@ class AdminService:
             return "등록 및 변경 완료"
 
     # 부캐삭제
-    def delete_mapping_name(self, ctx, riot_name):
+    def delete_mapping_name(self, ctx, riot_name, guild_id):
         
         if self.check_auth(ctx):
     
-            result = ru.delete_mapping_sub_name(riot_name)
+            result = ru.delete_mapping_sub_name(riot_name, guild_id)
             if result["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
             
@@ -116,14 +116,14 @@ class AdminService:
                 return "not found data"
 
     # 닉변
-    def update_riot_name_league_and_mapping(self, ctx, command: str):
+    def update_riot_name_league_and_mapping(self, ctx, command: str, guild_id):
         
         if self.check_auth(ctx):
             
             old_name, new_name = self.split_str(command)
     
-            result = ru.update_riot_name(new_name, old_name)
-            ru.update_mapping_riot_name(new_name, old_name)
+            result = ru.update_riot_name(new_name, old_name, guild_id)
+            ru.update_mapping_riot_name(new_name, old_name, guild_id)
             if result["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
             
@@ -134,12 +134,12 @@ class AdminService:
                 return "not found data"
 
     # 탈퇴/복귀
-    def update_delete_yn_league_and_mapping(self, ctx, delete_yn, riot_name):
+    def update_delete_yn_league_and_mapping(self, ctx, delete_yn, riot_name, guild_id):
         
         if self.check_auth(ctx):
             
-            result = ru.update_delete_yn(delete_yn, riot_name)
-            ru.update_mapping_delete_yn(delete_yn, riot_name)
+            result = ru.update_delete_yn(delete_yn, riot_name, guild_id)
+            ru.update_mapping_delete_yn(delete_yn, riot_name, guild_id)
             if result["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
             
@@ -153,11 +153,11 @@ class AdminService:
                 return "not found data"
 
     # 리플삭제
-    def delete_league(self, ctx, game_id):
+    def delete_league(self, ctx, game_id, guild_id):
     
         if self.check_auth(ctx):
     
-            result = ru.delete_league_by_game_id(game_id)
+            result = ru.delete_league_by_game_id(game_id, guild_id)
             if result["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
             
@@ -182,7 +182,7 @@ class AdminService:
     def check_auth(self, ctx):
         roles = ctx.author.roles  
         role_names = [role.name for role in roles] 
-        if "난민디코관리자" in role_names or "난민운영진" in role_names:
+        if "난민디코관리자" in role_names or "난민운영진" in role_names or "TRC관리자" in role_names:
             return True
         else:
             raise RecordNotFoundException("권한 없음")

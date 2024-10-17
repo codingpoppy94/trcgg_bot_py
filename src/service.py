@@ -9,14 +9,14 @@ ru = RequestUtil()
 class Service:
     
     # !전적
-    def all_record(self, ctx, riot_name:str):
+    def all_record(self, ctx, riot_name:str, guild_id):
         
         if riot_name is None:
             riot_name = self.get_member_nick(ctx)
             
         riot_name = riot_name.replace(" ", "").replace("й","n").strip()
             
-        all_data = ru.get_all_record(riot_name)
+        all_data = ru.get_all_record(riot_name, guild_id)
         if all_data['status_code'] != 200:
             raise RecordNotFoundException("connection error")
         
@@ -172,7 +172,7 @@ class Service:
         return TemplateUtil.create_embed(json_data)
 
     # !장인    
-    def champ_record(self, champ_name):
+    def champ_record(self, champ_name, guild_id):
         
         title = ""
         field_one_name = "판수(10판 이상)"
@@ -181,7 +181,7 @@ class Service:
         field_two_name = "승률(50% 이상)"
         field_two_value = ""
         
-        records = ru.get_champ_master(champ_name)
+        records = ru.get_champ_master(champ_name, guild_id)
         if records["status_code"] != 200:
             raise RecordNotFoundException("connection error")
         
@@ -218,11 +218,11 @@ class Service:
         return TemplateUtil.create_embed(json_data)
     
     # !라인
-    def get_line(self, position):
+    def get_line(self, position, guild_id):
         
         position = self.dict_postition(position)
         
-        records = ru.get_record_line(position)
+        records = ru.get_record_line(position, guild_id)
         if records["status_code"] != 200:
             raise RecordNotFoundException("connection error")
         
@@ -257,9 +257,9 @@ class Service:
         return TemplateUtil.create_embed(json_data)   
     
     # !결과
-    def get_game_result(self, game_id):
+    def get_game_result(self, game_id, guild_id):
         
-        records = ru.get_record_game_id(game_id)       
+        records = ru.get_record_game_id(game_id, guild_id)       
         if records["status_code"] != 200:
             raise RecordNotFoundException("connection error")
         
@@ -296,7 +296,7 @@ class Service:
         return TemplateUtil.create_embed(json_data) 
     
     # !통계
-    def get_league_stat(self, type, date: str=None):
+    def get_league_stat(self, type, guild_id, date: str=None):
         
         year, month = self.split_date(date)
         
@@ -304,7 +304,7 @@ class Service:
         title = f"{year}-{month} {type} 통계"
         
         if type == "게임":
-            records = ru.get_game_stats(year, month)
+            records = ru.get_game_stats(year, month, guild_id)
             if records["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
         
@@ -345,7 +345,7 @@ class Service:
             return TemplateUtil.create_embed(json_data) 
                             
         elif type == "챔프":
-            records = ru.get_champ_stats(year, month)
+            records = ru.get_champ_stats(year, month, guild_id)
             if records["status_code"] != 200:
                 raise RecordNotFoundException("connection error")
         
@@ -393,14 +393,14 @@ class Service:
             raise RecordNotFoundException("unexpected value")
         
     # !클랜통계
-    def get_clan_game_stat(self, date: str=None):
+    def get_clan_game_stat(self, guild_id, date: str=None):
         
         year, month = self.split_date(date)
         
         title = f"{year}-{month}\n"
         str = ""
         
-        records = ru.get_game_stats(year, month)
+        records = ru.get_game_stats(year, month, guild_id)
         if records["status_code"] != 200:
             raise RecordNotFoundException("connection error")
         
@@ -421,6 +421,7 @@ class Service:
         file_url = ""
         file_name = ""
         create_user = ""
+        guild_id = str(message.guild.id)
         
         for attachment in message.attachments:
             # 첨부파일의 URL을 가져옴
@@ -438,7 +439,8 @@ class Service:
             parts = file_name.split(".")
             file_name = ".".join(parts[:-1])
             # 리플 저장 call
-            return ru.save_league(file_url, file_name, create_user)['data']
+            return ru.save_league(file_url, file_name, create_user, guild_id)['data']
+        
         else :
             return f":red_circle:등록실패: {file_name} 잘못된 리플 파일 형식"
          

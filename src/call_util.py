@@ -26,7 +26,7 @@ class RequestUtil:
             if res.status_code != 200:
                 error_message = res.text
                 
-                return Exception(f"Error {res.status_code}: {error_message}") 
+                return (f"Error {res.status_code}: {error_message}") 
                 # raise Exception(f"Error {res.status_code}: {error_message}") 
             else:
                 return {"status_code": res.status_code, "data": res.json()}
@@ -38,129 +38,141 @@ class RequestUtil:
 # GET 
 
     # 전적 조회에 필요한 모든 서비스 조회
-    def get_all_record(self, riot_name):
-        url = contextPath + 'league/getAllRecord/' + riot_name
+    def get_all_record(self, riot_name, guild_id):
+        url = contextPath + f'league/getAllRecord/{riot_name}/{guild_id}'
         return self.call(url)
 
     # 전체전적조회
-    def get_record(self, riot_name):
-        url = contextPath + 'league/getRecord/' + riot_name
+    def get_record(self, riot_name, guild_id):
+        url = contextPath + f'league/getRecord/{riot_name}/{guild_id}'
         return self.call(url)
 
     # 최근한달조회
-    def get_record_month(self, riot_name):
-        url = contextPath + 'league/getRecordMonth/' + riot_name
+    def get_record_month(self, riot_name, guild_id):
+        url = contextPath + f'league/getRecordMonth/{riot_name}/{guild_id}'
         return self.call(url)
     
     # 최근 Top 10 게임 조회
-    def get_top_ten(self, riot_name):
-        url = contextPath + 'league/getTopTen/' + riot_name
+    def get_top_ten(self, riot_name, guild_id):
+        url = contextPath + f'league/getTopTen/{riot_name}/{guild_id}'
         return self.call(url)
     
     # 모스트픽
-    def get_most_pick(self, riot_name):
-        url = contextPath + 'league/getMostPick/' + riot_name
+    def get_most_pick(self, riot_name, guild_id):
+        url = contextPath + f'league/getMostPick/{riot_name}/{guild_id}'
         return self.call(url)
 
     # 최근 두달간 같은 팀 시너지
-    def get_record_with_team(self, riot_name):
-        url = contextPath + 'league/getRecordWithTeam/' + riot_name
+    def get_record_with_team(self, riot_name, guild_id):
+        url = contextPath + f'league/getRecordWithTeam/{riot_name}/{guild_id}'
         return self.call(url)
 
     # 나와 인간상성 찾기
-    def get_record_other_team(self, riot_name):
-        url = contextPath + 'league/getRecordOtherTeam/' + riot_name
+    def get_record_other_team(self, riot_name, guild_id):
+        url = contextPath + f'league/getRecordOtherTeam/{riot_name}/{guild_id}'
         return self.call(url)
 
     # 장인
-    def get_champ_master(self, champ_name):
-        url = contextPath + 'league/master/' + champ_name
+    def get_champ_master(self, champ_name, guild_id):
+        url = contextPath + f'league/master/{champ_name}/{guild_id}'
         return self.call(url)
 
     # 챔프 통계
-    def get_champ_stats(self, year, month):
-        url = contextPath + f'league/champStats/{year}/{month}'
+    def get_champ_stats(self, year, month, guild_id):
+        url = contextPath + f'league/champStats/{year}/{month}/{guild_id}'
         return self.call(url)
 
     # 게임 통계
-    def get_game_stats(self, year, month):
-        url = contextPath + f'league/gameStats/{year}/{month}'
+    def get_game_stats(self, year, month, guild_id):
+        url = contextPath + f'league/gameStats/{year}/{month}/{guild_id}'
         return self.call(url)
 
     # 라인별 승률 조회
-    def get_record_line(self, position):
-        url = contextPath + 'league/lineStats/' + position
+    def get_record_line(self, position, guild_id):
+        url = contextPath + f'league/lineStats/{position}/{guild_id}'
         return self.call(url)
 
     # 게임 결과
-    def get_record_game_id(self, game_id):
-        url = contextPath + 'league/gameResult/' + game_id
+    def get_record_game_id(self, game_id, guild_id):
+        url = contextPath + f'league/gameResult/{game_id}/{guild_id}'
         return self.call(url)
 
     # 부캐 조회
-    def get_mapping_name(self):
-        url = contextPath + 'league/getMappingName'
+    def get_mapping_name(self, guild_id):
+        url = contextPath + f'league/getMappingName/{guild_id}'
         return self.call(url)
 
     # # 중복 리플 파일 조회
     # def get_replay_name(game_id):
     #     url = contextPath + 'league/getReplayName/' + game_id
     #     return self.call(url)
+    
+    # 길드 조회
+    def get_guild(self, guild_id):
+        url = contextPath + f'league/getGuild/{guild_id}'
+        return self.call(url)
 
 # POST
 
     # 리플 데이터 저장 url 만 보내줄거양
-    def save_league(self, file_url, file_name, create_user):
+    def save_league(self, file_url, file_name, create_user, guild_id):
         url = contextPath + 'league/parse'
         data = {
             "file_url": file_url,
             "file_name": file_name,
-            "create_user": create_user
+            "create_user": create_user,
+            "guild_id": guild_id
         }
         return self.call(url, method="POST", data=data)
 
     # 부캐 저장
-    def save_mapping_name(self, sub_name, main_name):
+    def save_mapping_name(self, sub_name, main_name, guild_id):
         url = contextPath + 'league/mapping'
-        data = {"sub_name": sub_name, "main_name": main_name}
+        data = {"sub_name": sub_name, "main_name": main_name, "guild_id": guild_id }
+        return self.call(url, method="POST", data=data)
+
+    # 길드 저장
+    def save_guild(self, guild_id, guild_name):
+        url = contextPath + 'league/saveGuild'
+        data = {"guild_id": guild_id, "guild_name": guild_name}
         return self.call(url, method="POST", data=data)
 
 # PUT
 
     # 탈퇴 - 리그 정보
-    def update_delete_yn(self, delete_yn, riot_name):
+    def update_delete_yn(self, delete_yn, riot_name, guild_id):
         url = contextPath + 'league/deleteYn'
-        data = {"delete_yn": delete_yn, "riot_name": riot_name}
+        data = {"delete_yn": delete_yn, "riot_name": riot_name, "guild_id": guild_id }
         return self.call(url, method="PUT", data=data)
 
     # 탈퇴 - 부캐 닉네임
-    def update_mapping_delete_yn(self, delete_yn, riot_name):
+    def update_mapping_delete_yn(self, delete_yn, riot_name, guild_id):
         url = contextPath + 'league/mapping/deleteYn'
-        data = {"delete_yn": delete_yn, "riot_name": riot_name}
+        data = {"delete_yn": delete_yn, "riot_name": riot_name, "guild_id": guild_id}
         return self.call(url, method="PUT", data=data)
 
     # 닉변 - 리그 정보
-    def update_riot_name(self, new_name, old_name):
+    def update_riot_name(self, new_name, old_name, guild_id):
         url = contextPath + 'league/riotName'
-        data = {"new_name": new_name, "old_name": old_name}
+        data = {"new_name": new_name, "old_name": old_name, "guild_id": guild_id}
         return self.call(url, method="PUT", data=data)
 
     # 닉변 - 부캐 닉네임 
-    def update_mapping_riot_name(self, new_name, old_name):
+    def update_mapping_riot_name(self, new_name, old_name, guild_id):
         url = contextPath + 'league/mapping/riotName'
-        data = {"new_name": new_name, "old_name": old_name}
+        data = {"new_name": new_name, "old_name": old_name, "guild_id": guild_id}
         return self.call(url, method="PUT", data=data)
 
 # DELETE
 
     # 리플 삭제
-    def delete_league_by_game_id(self, game_id):
+    def delete_league_by_game_id(self, game_id, guild_id):
         url = contextPath + 'league/game'
-        data = {"game_id" : game_id}
+        data = {"game_id" : game_id, "guild_id": guild_id}
         return self.call(url, method="DELETE", data=data)
 
     # 부캐삭제
-    def delete_mapping_sub_name(self, riot_name):
+    def delete_mapping_sub_name(self, riot_name, guild_id):
         url = contextPath + 'league/mapping/subName'
-        data = {"riot_name" : riot_name}
+        data = {"riot_name" : riot_name, "guild_id": guild_id}
         return self.call(url, method="DELETE", data=data)
