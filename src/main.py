@@ -35,6 +35,14 @@ async def record(ctx, *, riot_name: str= None):
         await ctx.send(embed=service.all_record(ctx, riot_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
+
+@bot.command(name='최근전적')
+async def record(ctx, riot_name: str):
+    try:
+        guild_id = ctx.guild.id
+        await ctx.send(embed=service.topten_record(riot_name, guild_id))
+    except RecordNotFoundException as e:
+        await ctx.send(str(e))
     
 @bot.command(name='장인')
 async def master(ctx, champ_name: str):

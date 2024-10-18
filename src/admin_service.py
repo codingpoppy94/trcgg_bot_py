@@ -12,6 +12,7 @@ class AdminService:
         # 검색 명령어
         field_one_value = (
             "`!전적 !전적 {name}` 자신의 전적, name의 전적 검색 \n"
+            "`!최근전적 {name}` 최근 10게임 상세 검색\n"
             "`!결과 {gameId}` 내전 게임 결과 검색 \n"
             "`!장인 {champ}` 픽률-승률 장인 목록 \n"
             "`!통계 게임|챔프` 게임,챔프 통계 \n"

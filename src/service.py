@@ -171,6 +171,34 @@ class Service:
         
         return TemplateUtil.create_embed(json_data)
 
+    # !최근전적
+    def topten_record(self, riot_name, guild_id):
+        
+        title = f"{riot_name} 최근 상세 전적"
+        desc_value = ""
+        
+        records = ru.get_top_ten(riot_name, guild_id)
+        if records["status_code"] != 200:
+            raise RecordNotFoundException("connection error")
+        
+        if not records["data"]:
+            raise RecordNotFoundException("not found data")
+        
+        for record in records["data"]:
+            if record["game_result"] == "승":
+                desc_value += ":blue_circle: "
+            elif record["game_result"] == "패":
+                desc_value += ":red_circle: "
+            desc_value += f"{record['game_id']} {record['game_team']} {record['position']} {record['champ_name']} {record['kill']}/{record['death']}/{record['assist']} 핑와:{record['vision_bought']} 피해량:{record['total_damage_champions']} \n"
+        
+        json_data = {
+            "title":title,
+            "description":desc_value,
+            "fields": []
+        }
+        
+        return TemplateUtil.create_embed(json_data)
+
     # !장인    
     def champ_record(self, champ_name, guild_id):
         
@@ -220,7 +248,7 @@ class Service:
     # !라인
     def get_line(self, position, guild_id):
         
-        position = self.dict_postition(position)
+        position = self.dict_position(position)
         
         records = ru.get_record_line(position, guild_id)
         if records["status_code"] != 200:
@@ -447,7 +475,7 @@ class Service:
     ################ #######################    
         
     # 라인 dict
-    def dict_postition(self, position):
+    def dict_position(self, position):
         if position == "탑":
             real_position = "TOP"
         elif position == "정글":
