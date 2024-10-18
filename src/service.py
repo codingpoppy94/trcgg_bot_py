@@ -481,7 +481,9 @@ class Service:
         if riot_name is None:
             raise RecordNotFoundException("별명 설정 필요")
         else :
-            riot_name = riot_name.split("/")[0]
+            if '/' in riot_name:
+                riot_name = riot_name.split("/")[0]
+                
             return riot_name
     
     # 리플 파일명 정규식 체크
