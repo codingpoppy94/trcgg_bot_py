@@ -1,0 +1,43 @@
+name: trcgg_bot_py CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  backend-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # STEP - CHECKOUT
+      - name: Checkout source codes
+        uses: actions/checkout@v4
+
+      # STEP - SETTING - Docker network
+      - name: Create Docker Network
+        run: docker network create trc_network
+
+      
+      # STEP - BUILD - Docker image
+      - name: Build the Docker image
+        run: docker buildx build --platform linux/arm64 -t codingpoppy94/trc_bot:1.0 .
+
+      # STEP - PUBLISH 
+      - name: Publish to docker hub
+        run: docker push codingpoppy94/trc_bot:1.0
+
+      # STEP - ACCESS - TRC.GG Server
+      - name: Connect to trc.gg Server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.WAS_HOST }}
+          username: ${{ secrets.WAS_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.WAS_SSH_PORT }}
+          script: |
+            docker stop $(docker ps -a -q)
+            docker rm $(docker ps -a -q)
+            docker pull codingpoppy94/trc_bot:1.0
+            docker run -d --name trc_bot --network trc_network codingpoppy94/trc_bot:1.0
+            
