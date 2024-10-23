@@ -16,7 +16,7 @@ guild_service = GuildService()
 load_dotenv()
 
 # os 설정
-token = os.getenv('TOKEN')
+token = os.getenv('DISCORD_TOKEN')
 trc_channel_id = int(os.getenv('TRC_CHANNEL_ID'))
 
 # Discord 봇 설정
