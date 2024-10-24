@@ -10,50 +10,11 @@ jobs:
   backend-deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: Get Public IP
+      id: ip
+      uses: haythem/public-ip@v1.3
+
+    - name: Print Public IP
+      run: |
+        echo ${{ steps.ip.outputs.ipv4 }}
     
-    # STEP - CHECKOUT
-    - name: Checkout source code
-      uses: actions/checkout@v4
-      
-    # STEP - VARIABLE SETTING
-    - name: Set Environment Variables and List Files
-      run: |
-        echo "TRC_CHANNEL_ID=$TRC_CHANNEL_ID" >> src/.env
-        echo "DISCORD_TOKEN=$DISCORD_TOKEN" >> src/.env
-        echo "CONTEXTPATH=$CONTEXTPATH" >> src/.env
-      env:
-        TRC_CHANNEL_ID: ${{ secrets.TRC_CHANNEL_ID }}
-        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-        CONTEXTPATH: ${{ secrets.CONTEXTPATH }}
-
-    # STEP - ACCESS - Docker Hub
-    - name: Connect to Docker hub
-      uses: docker/login-action@v3.1.0
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    # STEP - BUILD&PUBLISH - Docker image
-    - name: Build and Publishing the Docker image
-      run: |
-        docker buildx create --use
-        docker buildx build --platform linux/arm64 \
-        --tag codingpoppy94/trc_bot:1.1 \
-        --push .
-
-    # STEP - ACCESS - TRC.GG Server
-    - name: Connect to trc.gg Server
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.WAS_HOST }}
-        username: ${{ secrets.WAS_USERNAME }}
-        password: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.WAS_SSH_PORT }}
-        script: |
-          docker stop $(docker ps -a -q)
-          docker rm $(docker ps -a -q)
-          docker pull codingpoppy94/trc_service:1.1
-          docker pull codingpoppy94/trc_bot:1.1
-          docker network create trc_network
-          docker run -d --name trc_service -p 24001:24001 --network trc_network codingpoppy94/trc_service:1.1
-          docker run -d --name trc_bot --network trc_network codingpoppy94/trc_bot:1.1
