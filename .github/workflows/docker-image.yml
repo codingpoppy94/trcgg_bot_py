@@ -1,4 +1,4 @@
-name: trcgg_py CI/CD
+name: trcgg_bot_py CI/CD
 
 on:
   push:
