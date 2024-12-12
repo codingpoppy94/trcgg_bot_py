@@ -203,7 +203,7 @@ async def scheduled_message():
         await channel.send("```19:30 시작합니다. 시작 5분전에 대기해주세요.```")
         
 # 롤체 출석 오후 10시
-@scheduler.scheduled_job('cron', hour=22, minute=00)
+@scheduler.scheduled_job('cron', hour=21, minute=59)
 async def lolchess_message():
     url = 'https://discord.com/api/webhooks/1315616035222589492/0Hi3t2hmXTPiQdfnaYOg2Ff1uDSDb6zZ3m84QVNdOLg4dCYDgLlyB3806QnId9I7nNxh?thread_id=1234521788432650261'
     message = {"content": "```출석은 22:00부터 게임은 23:00 시작합니다. 시작 5분전에 대기해주세요.\n롤토체스 진행자는 첫 출석찍은 사람입니다. 막판과 대기자관리 부탁드립니다. ```" }
