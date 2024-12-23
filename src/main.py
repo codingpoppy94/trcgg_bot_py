@@ -189,32 +189,32 @@ async def on_command_error(ctx, error):
         raise error
 
 # bot 실행시    
-# @bot.event
-# async def on_ready():
-#     scheduler.start()
+@bot.event
+def on_ready():
+   scheduler.start()
     
 ## 스케쥴
 
-# # 내전 출석에 오후 5시마다 메시지 전송
-# @scheduler.scheduled_job('cron', hour=17, minute=0)
-# async def scheduled_message():
-#     channel = bot.get_channel(trc_channel_id)
-#     if channel:
-#         await channel.send("```19:30 시작합니다. 시작 5분전에 대기해주세요.```")
+# 내전 출석에 오후 5시마다 메시지 전송
+@scheduler.scheduled_job('cron', hour=17, minute=0)
+def scheduled_message():
+    channel = bot.get_channel(trc_channel_id)
+    if channel:
+        channel.send("```19:30 시작합니다. 시작 5분전에 대기해주세요.```")
         
-# # 롤체 출석 오후 10시
-# @scheduler.scheduled_job('cron', hour=21, minute=59)
-# async def lolchess_message():
-#     url = 'https://discord.com/api/webhooks/1315616035222589492/0Hi3t2hmXTPiQdfnaYOg2Ff1uDSDb6zZ3m84QVNdOLg4dCYDgLlyB3806QnId9I7nNxh?thread_id=1234521788432650261'
-#     message = {"content": "```출석은 22:00부터 게임은 23:00 시작합니다. 시작 5분전에 대기해주세요.\n롤토체스 진행자는 첫 출석찍은 사람입니다. 막판과 대기자관리 부탁드립니다. ```" }
-#     await requests.post(url, data=message)
+# 롤체 출석 오후 10시
+@scheduler.scheduled_job('cron', hour=21, minute=59)
+def lolchess_message():
+    url = 'https://discord.com/api/webhooks/1315616035222589492/0Hi3t2hmXTPiQdfnaYOg2Ff1uDSDb6zZ3m84QVNdOLg4dCYDgLlyB3806QnId9I7nNxh?thread_id=1234521788432650261'
+    message = {"content": "```출석은 22:00부터 게임은 23:00 시작합니다. 시작 5분전에 대기해주세요.\n롤토체스 진행자는 첫 출석찍은 사람입니다. 막판과 대기자관리 부탁드립니다. ```" }
+    requests.post(url, data=message)
         
-# # 칼바 출석 오후 10시
-# @scheduler.scheduled_job('cron', hour=22, minute=00)
-# async def kalba_message():
-#     url = 'https://discord.com/api/webhooks/1315616054965174302/usGs8FlqC_3cgnCl68xDViKuSGYuDTujMdbd6kiTho3da-RQbptZqdCPd_JQiPQose10?thread_id=1234521842434183198'
-#     message = {"content": "```꿈과 행복이 가득한 겨울왕국❄️ 칼바람 나락! 당신의 얼어붙은 마음을 녹이고 싶지는 않으신가요?\n출석은 22:00부터 게임은 23:00시작!! 대기하는 사람들이 추위에 떨지 않게 시작 5분전에는 꼭 와주세요!```"}
-#     await requests.post(url, data=message)        
+# 칼바 출석 오후 10시
+@scheduler.scheduled_job('cron', hour=22, minute=00)
+def kalba_message():
+    url = 'https://discord.com/api/webhooks/1315616054965174302/usGs8FlqC_3cgnCl68xDViKuSGYuDTujMdbd6kiTho3da-RQbptZqdCPd_JQiPQose10?thread_id=1234521842434183198'
+    message = {"content": "```꿈과 행복이 가득한 겨울왕국❄️ 칼바람 나락! 당신의 얼어붙은 마음을 녹이고 싶지는 않으신가요?\n출석은 22:00부터 게임은 23:00시작!! 대기하는 사람들이 추위에 떨지 않게 시작 5분전에는 꼭 와주세요!```"}
+    requests.post(url, data=message)        
 
 
 # bot.add_command(_record)
