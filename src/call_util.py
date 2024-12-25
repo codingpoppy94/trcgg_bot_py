@@ -30,7 +30,7 @@ class RequestUtil:
                 return {"status_code": res.status_code, "data": error_message }
             else:
                 result = {"status_code": res.status_code, "data": res.json() }
-                print(result)
+                # print(result)
                 return {"status_code": res.status_code, "data": res.json() }
         
         except Exception as e:
