@@ -26,6 +26,7 @@ class RequestUtil:
             if res.status_code != 200:
                 error_message = res.text
                 result = {"status_code": res.status_code, "data": error_message }
+                print(url)
                 print(result)
                 return {"status_code": res.status_code, "data": error_message }
             else:
