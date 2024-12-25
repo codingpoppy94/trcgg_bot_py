@@ -32,7 +32,7 @@ scheduler = AsyncIOScheduler()
 @bot.command(name='전적')
 async def record(ctx, *, riot_name: str= None):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(embed=service.all_record(ctx, riot_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -40,7 +40,7 @@ async def record(ctx, *, riot_name: str= None):
 @bot.command(name='최근전적')
 async def record(ctx, riot_name: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(embed=service.topten_record(riot_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -48,7 +48,7 @@ async def record(ctx, riot_name: str):
 @bot.command(name='장인')
 async def master(ctx, champ_name: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(embed=service.champ_record(champ_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -56,7 +56,7 @@ async def master(ctx, champ_name: str):
 @bot.command(name='라인')
 async def line(ctx, champ_name: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(embed=service.get_line(champ_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -64,7 +64,7 @@ async def line(ctx, champ_name: str):
 @bot.command(name='결과')
 async def game_result(ctx, game_id: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(embed=service.get_game_result(game_id, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -72,7 +72,7 @@ async def game_result(ctx, game_id: str):
 @bot.command(name='통계')
 async def stats(ctx, type: str, date: str=None):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(embed=service.get_league_stat(type, guild_id, date))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -80,7 +80,7 @@ async def stats(ctx, type: str, date: str=None):
 @bot.command(name='클랜통계')
 async def clan_stats(ctx, date: str=None):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(service.get_clan_game_stat(guild_id, date))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -97,7 +97,7 @@ async def help(ctx):
 @bot.command(name='부캐목록')
 async def help(ctx):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(embed=admin_service.get_mapping_name(guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -113,7 +113,7 @@ async def add_sub_name(ctx, command: str):
 @bot.command(name='부캐삭제')
 async def delete_sub_name(ctx, riot_name: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(admin_service.delete_mapping_name(ctx, riot_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -121,7 +121,7 @@ async def delete_sub_name(ctx, riot_name: str):
 @bot.command(name='닉변')
 async def change_riot_name(ctx, command: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(admin_service.update_riot_name_league_and_mapping(ctx, command, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -129,7 +129,7 @@ async def change_riot_name(ctx, command: str):
 @bot.command(name='탈퇴')
 async def with_draw(ctx, riot_name: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(admin_service.update_delete_yn_league_and_mapping(ctx, "Y", riot_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -137,7 +137,7 @@ async def with_draw(ctx, riot_name: str):
 @bot.command(name='복귀')
 async def recover(ctx, riot_name: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(admin_service.update_delete_yn_league_and_mapping(ctx, "N", riot_name, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -146,7 +146,7 @@ async def recover(ctx, riot_name: str):
 @bot.command(name='drop')
 async def delete_replay(ctx, game_id: str):
     try:
-        guild_id = ctx.guild.id
+        guild_id = str(ctx.guild.id)
         await ctx.send(admin_service.delete_league(ctx, game_id, guild_id))
     except RecordNotFoundException as e:
         await ctx.send(str(e))
@@ -200,7 +200,7 @@ async def on_ready():
 async def scheduled_message():
     channel = bot.get_channel(trc_channel_id)
     if channel:
-        channel.send("```19:30 시작합니다. 시작 5분전에 대기해주세요.```")
+        await channel.send("```19:30 시작합니다. 시작 5분전에 대기해주세요.```")
         
 # 롤체 출석 오후 10시
 @scheduler.scheduled_job('cron', hour=21, minute=59)

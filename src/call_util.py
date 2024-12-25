@@ -17,23 +17,24 @@ class RequestUtil:
             elif method == "POST":
                 res = requests.post(url, json=data)
             elif method == "PUT":
-                res = requests.put(url, params=data)
+                res = requests.put(url, json=data)
             elif method == "DELETE":
-                res = requests.delete(url, params=data)
+                res = requests.delete(url, json=data)
             else:
                 raise ValueError("Unsupported HTTP method")
             
             if res.status_code != 200:
                 error_message = res.text
-                
-                return (f"Error {res.status_code}: {error_message}") 
-                # raise Exception(f"Error {res.status_code}: {error_message}") 
+                result = {"status_code": res.status_code, "data": error_message }
+                print(result)
+                return {"status_code": res.status_code, "data": error_message }
             else:
-                return {"status_code": res.status_code, "data": res.json()}
+                result = {"status_code": res.status_code, "data": res.json() }
+                print(result)
+                return {"status_code": res.status_code, "data": res.json() }
         
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             print(f"Error while making request: {e}")
-            return {"status_code": res.status_code, "data": None}
 
 # GET 
 

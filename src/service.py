@@ -467,7 +467,11 @@ class Service:
             parts = file_name.split(".")
             file_name = ".".join(parts[:-1])
             # 리플 저장 call
-            return ru.save_league(file_url, file_name, create_user, guild_id)['data']
+            result = ru.save_league(file_url, file_name, create_user, guild_id)
+            if result['status_code'] != 200:
+                return result
+            else:
+                return result['data']
         
         else :
             return f":red_circle:등록실패: {file_name} 잘못된 리플 파일 형식"
